@@ -1,0 +1,4 @@
+pharmacy_api:
+    resource: Pharmacy\ApiBundle\Controller\PharmacyController
+    type:     rest
+    prefix:   /v1

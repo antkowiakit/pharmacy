@@ -1,0 +1,4 @@
+services:
+    pharmacy.pharmacy_manager:
+        class: Pharmacy\ApiBundle\Service\PharmacyManager
+        arguments: ['@doctrine.orm.entity_manager', '@validator']

@@ -74,7 +74,15 @@ class PharmacyManager {
 
 
         foreach ($this->csvToArray($file) as $pharmacy) {
-            $this->createPharmacy($pharmacy['name'], $pharmacy['address'], $pharmacy['code'], $pharmacy['city'], $pharmacy['country'], $pharmacy['lat'], $pharmacy['lng']);
+            $this->createPharmacy(
+                $pharmacy['name'],
+                $pharmacy['address'],
+                $pharmacy['code'],
+                $pharmacy['city'],
+                $pharmacy['country'],
+                $pharmacy['lat'],
+                $pharmacy['lng']
+            );
         }
     }
 
@@ -96,13 +104,13 @@ class PharmacyManager {
     private function csvToArray($filename='', $delimiter=';')
     {
         if(!file_exists($filename) || !is_readable($filename))
-            return FALSE;
+            return false;
 
-        $header = NULL;
+        $header = null;
         $data = array();
-        if (($handle = fopen($filename, 'r')) !== FALSE)
+        if (($handle = fopen($filename, 'r')) !== false)
         {
-            while (($row = fgetcsv($handle, 1000, $delimiter)) !== FALSE)
+            while (($row = fgetcsv($handle, 1000, $delimiter)) !== false)
             {
                 if(!$header)
                     $header = $row;

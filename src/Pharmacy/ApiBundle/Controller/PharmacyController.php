@@ -12,6 +12,7 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcher;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Pharmacy\ApiBundle\Entity\PharmacyInput;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class PharmacyController extends FOSRestController
 {
@@ -25,33 +26,20 @@ class PharmacyController extends FOSRestController
      *     200 = "Returned when successful",
      *     400 = "Returned when the form has errors"
      *   },
-     *  requirements={
-     *      {
-     *          "name"="range",
-     *          "dataType"="float",
-     *          "description"="Range from coordinate."
-     *      },
-     *     {
-     *          "name"="lat",
-     *          "dataType"="float",
-     *          "description"="Latitude."
-     *      },
-     *     {
-     *          "name"="lng",
-     *          "dataType"="float",
-     *          "description"="Longitude."
-     *      },
-     *  },
      *   section = "pharmacy"
      * )
+     * @param ParamFetcher $paramFetcher Paramfetcher
+     * @Rest\QueryParam(name="range", requirements="[0-9]+", nullable=false, allowBlank=false, strict=true, description="Range from coordinate.")
+     * @Rest\QueryParam(name="lat", requirements="(\-?)([0-8]?[0-9])|(\-?)(90(\.0+)?)", nullable=false, allowBlank=false, strict=true, description="Latitude.")
+     * @Rest\QueryParam(name="lng", requirements="(\-?)(1[0-7][0-9])|([0-9]?[0-9])|(\-?)(180(\.0+)?)", nullable=false, strict=true, allowBlank=false, description="Longitude.")
      *
      * @Rest\View()
-     * @Rest\Get("/{lat}/{lng}/{range}")
+     * @Rest\Get("/pharmacy")
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction($lat, $lng, $range)
+    public function indexAction(ParamFetcher $paramFetcher)
     {
-        $pharmacyInput = new PharmacyInput($lat, $lng, $range);
+        $pharmacyInput = new PharmacyInput($paramFetcher->get('lat'), $paramFetcher->get('lng'), $paramFetcher->get('range'));
         $pharmacs = $this->get('pharmacy.pharmacy_manager')->getPharmacyInRange($pharmacyInput);
 
         $view = $this->view($pharmacs, 200);
@@ -76,7 +64,7 @@ class PharmacyController extends FOSRestController
      * @Rest\FileParam(name="csv_file", description="CSV file.")
      *
      * @Rest\View()
-     * @Rest\Post("/import")
+     * @Rest\Post("pharmacy/import")
      * @param ParamFetcher $paramFetcher
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -85,6 +73,7 @@ class PharmacyController extends FOSRestController
         $this->get('pharmacy.pharmacy_manager')->importPharmacy($paramFetcher->get('csv_file'));
 
         $view = $this->view([], 204);
+
         return $this->handleView($view);
 
     }

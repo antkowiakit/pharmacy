@@ -14,7 +14,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class PharmacyManager {
+class PharmacyManager
+{
     private $em;
     private $pharmacyRepository;
     private $validator;
@@ -51,28 +52,6 @@ class PharmacyManager {
         }
 
         return $pharmacys;
-    }
-
-    public function createPharmacy($name, $address, $post_code, $city, $country, $lat, $lng)
-    {
-        $pharmacy = new Pharmacy();
-        $pharmacy->setName(trim($name));
-        $pharmacy->setAddress(trim($address));
-        $pharmacy->setPostCode(trim($post_code));
-        $pharmacy->setCity(trim($city));
-        $pharmacy->setCountry(trim($country));
-        $pharmacy->setLat($this->validateCoordinate(floatval($lat)));
-        $pharmacy->setLng($this->validateCoordinate(floatval($lng)));
-
-        return $this->save($pharmacy);
-    }
-
-    private function validateCoordinate($coordinate) {
-        if (!preg_match('/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?);[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/', $coordinate)) {
-            throw new HttpException(400, 'Bad coordinate.');
-        }
-
-        return $coordinate;
     }
 
     /** @var UploadedFile $file */
@@ -114,39 +93,72 @@ class PharmacyManager {
         $this->em->flush();
     }
 
-    public function save($e)
+    private function csvToArray($filename = '', $delimiter = ';')
     {
-        $validator = $this->validator->validate($e);
-        if (0 === count($validator)) {
-            $this->em->persist($e);
-            $this->em->flush();
-            return $e;
-        } else {
-            foreach ($validator as $v) {
-                throw new HttpException(400, $v->getPropertyPath() . '-' . $v->getMessage());
-            }
-            return false;
-        }
-    }
-
-    private function csvToArray($filename='', $delimiter=';')
-    {
-        if(!file_exists($filename) || !is_readable($filename))
+        if (!file_exists($filename) || !is_readable($filename))
             return false;
 
         $header = null;
         $data = array();
-        if (($handle = fopen($filename, 'r')) !== false)
-        {
-            while (($row = fgetcsv($handle, 1000, $delimiter)) !== false)
-            {
-                if(!$header)
+        if (($handle = fopen($filename, 'r')) !== false) {
+            while (($row = fgetcsv($handle, 1000, $delimiter)) !== false) {
+                if (!$header)
                     $header = $row;
                 else
                     $data[] = array_combine($header, $row);
             }
             fclose($handle);
         }
+
         return $data;
+    }
+
+    public function createPharmacy($name, $address, $post_code, $city, $country, $lat, $lng)
+    {
+        $pharmacy = new Pharmacy();
+        $pharmacy->setName(trim($name));
+        $pharmacy->setAddress(trim($address));
+        $pharmacy->setPostCode(trim($post_code));
+        $pharmacy->setCity(trim($city));
+        $pharmacy->setCountry(trim($country));
+        $pharmacy->setLat($this->validateLatCoordinate(floatval($lat)));
+        $pharmacy->setLng($this->validateLngCoordinate(floatval($lng)));
+
+        return $this->save($pharmacy);
+    }
+
+    private function validateLatCoordinate($coordinate)
+    {
+        if (!preg_match('/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/', $coordinate)) {
+            throw new HttpException(400, 'Bad latitude coordinate.');
+        }
+
+        return $coordinate;
+    }
+
+    private function validateLngCoordinate($coordinate)
+    {
+        if (!preg_match('/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/', $coordinate)) {
+            throw new HttpException(400, 'Bad longitude coordinate.');
+        }
+
+        return $coordinate;
+    }
+
+    public function save($e)
+    {
+        $validator = $this->validator->validate($e);
+        if (0 === count($validator)) {
+            $this->em->persist($e);
+            $this->em->flush();
+
+            return $e;
+        } else {
+            foreach ($validator as $v) {
+                throw new HttpException(400, $v->getPropertyPath() . '-' . $v->getMessage());
+            }
+
+            return false;
+        }
     }
 }

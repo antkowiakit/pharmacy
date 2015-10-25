@@ -7,9 +7,8 @@
  */
 namespace Pharmacy\ApiBundle\Entity;
 
-use Symfony\Component\HttpKernel\Exception\HttpException;
-
-final class PharmacyInput {
+final class PharmacyInput
+{
     private $range;
     private $lat;
     private $lng;
@@ -17,10 +16,8 @@ final class PharmacyInput {
     public function __construct($lat, $lng, $range)
     {
         $this->lat = floatval($lat);
-        $this->validateCoordinate($this->lat);
         $this->lng = floatval($lng);
-        $this->validateCoordinate($this->lng);
-        $this->range = floatval($range);
+        $this->range = intval($range);
     }
 
     /**
@@ -45,11 +42,5 @@ final class PharmacyInput {
     public function getLng()
     {
         return $this->lng;
-    }
-
-    private function validateCoordinate($coordinate) {
-        if (!preg_match('/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?);[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/', $coordinate)) {
-            throw new HttpException(400, 'Bad coordinate.');
-        }
     }
 }

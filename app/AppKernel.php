@@ -22,6 +22,7 @@ class AppKernel extends Kernel
             new Nelmio\ApiDocBundle\NelmioApiDocBundle(),
             new Pharmacy\ApiBundle\PharmacyApiBundle(),
             new JMS\SerializerBundle\JMSSerializerBundle(),
+            new Pharmacy\LandingBundle\PharmacyLandingBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

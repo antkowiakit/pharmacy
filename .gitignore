@@ -11,3 +11,7 @@
 /web/bundles/
 /.idea/
 /composer.lock
+/web/bundles
+/web/css
+/web/images
+/web/js

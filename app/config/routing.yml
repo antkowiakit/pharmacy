@@ -1,3 +1,8 @@
+pharmacy_landing:
+    resource: "@PharmacyLandingBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
 pharmacy_api:
     resource: "@PharmacyApiBundle/Resources/config/routing.yml"
     prefix:   /api

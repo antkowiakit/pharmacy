@@ -35,8 +35,13 @@ h6 {
     padding-bottom: 50px;
     text-align: center;
     color: #f8f8f8;
-    background: url(../img/intro-bg.jpg) no-repeat center center;
+    background: url(../img/intro-bg.jpg) no-repeat;
     background-size: cover;
+    background-position: right top;
+    background-size: 700px 500px;
+    background-color: #000000;
+    background-position-y: 60px;
+
 }
 
 .intro-message {

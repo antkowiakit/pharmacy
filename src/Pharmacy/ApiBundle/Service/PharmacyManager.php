@@ -10,6 +10,7 @@ namespace Pharmacy\ApiBundle\Service;
 use Doctrine\ORM\EntityManager;
 use Pharmacy\ApiBundle\Entity\Pharmacy;
 use Pharmacy\ApiBundle\Entity\PharmacyInput;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -60,30 +61,57 @@ class PharmacyManager {
         $pharmacy->setPostCode(trim($post_code));
         $pharmacy->setCity(trim($city));
         $pharmacy->setCountry(trim($country));
-        $pharmacy->setLat(floatval($lat));
-        $pharmacy->setLng(floatval($lng));
+        $pharmacy->setLat($this->validateCoordinate(floatval($lat)));
+        $pharmacy->setLng($this->validateCoordinate(floatval($lng)));
 
         return $this->save($pharmacy);
     }
 
+    private function validateCoordinate($coordinate) {
+        if (!preg_match('/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?);[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/', $coordinate)) {
+            throw new HttpException(400, 'Bad coordinate.');
+        }
+
+        return $coordinate;
+    }
+
+    /** @var UploadedFile $file */
     public function importPharmacy($file)
     {
-        $connection = $this->em->getConnection();
-        $platform  = $connection->getDatabasePlatform();
-        $connection->executeUpdate($platform->getTruncateTableSQL('pharmacy'));
-
-
-        foreach ($this->csvToArray($file) as $pharmacy) {
-            $this->createPharmacy(
-                $pharmacy['name'],
-                $pharmacy['address'],
-                $pharmacy['code'],
-                $pharmacy['city'],
-                $pharmacy['country'],
-                $pharmacy['lat'],
-                $pharmacy['lng']
-            );
+        if ($file->getMimeType() != 'text/plain') {
+            throw new HttpException(400, 'Invalid file type.');
         }
+
+        $this->em->getConnection()->beginTransaction();
+        $pharmacys = $this->pharmacyRepository->findAll();
+        foreach ($pharmacys as $pharmacy) {
+            $this->remove($pharmacy);
+        }
+
+        try {
+            foreach ($this->csvToArray($file) as $pharmacy) {
+                $this->createPharmacy(
+                    $pharmacy['name'],
+                    $pharmacy['address'],
+                    $pharmacy['code'],
+                    $pharmacy['city'],
+                    $pharmacy['country'],
+                    $pharmacy['lat'],
+                    $pharmacy['lng']
+                );
+            }
+        } catch (\Exception $e) {
+            $this->em->getConnection()->rollback();
+            throw $e;
+        }
+
+        $this->em->getConnection()->commit();
+    }
+
+    public function remove($e)
+    {
+        $this->em->remove($e);
+        $this->em->flush();
     }
 
     public function save($e)

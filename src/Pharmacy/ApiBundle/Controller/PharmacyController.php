@@ -31,7 +31,7 @@ class PharmacyController extends FOSRestController
      * @param ParamFetcher $paramFetcher Paramfetcher
      * @Rest\QueryParam(name="range", requirements="[0-9]+", nullable=false, allowBlank=false, strict=true, description="Range from coordinate.")
      * @Rest\QueryParam(name="lat", requirements="(\-?)([0-8]?[0-9])\.(\d+)|(\-?)(90(\.0+)?)", nullable=false, allowBlank=false, strict=true, description="Latitude.")
-     * @Rest\QueryParam(name="lng", requirements="(\-?)(1[0-7][0-9])\.(\d+)|([0-9]?[0-9])|(\-?)(180(\.0+)?)", nullable=false, strict=true, allowBlank=false, description="Longitude.")
+     * @Rest\QueryParam(name="lng", requirements="(\-?)(1[0-7][0-9])\.(\d+)|([0-9]?[0-9]).(\d+)|(\-?)(180(\.0+)?)", nullable=false, strict=true, allowBlank=false, description="Longitude.")
      *
      * @Rest\View()
      * @Rest\Get("/pharmacy")

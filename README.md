@@ -1,4 +1,4 @@
-pharmacy
+Apteki - Pharmacy
 ======
 
-A Symfony project created on October 24, 2015, 3:30 pm.
+Projekt Apteki, to wyszukiwarka aptek w pobliżu, z możliwością wyznaczenia drogi. Strona domowa projektu: http://pharmacy.antkowiak.it/

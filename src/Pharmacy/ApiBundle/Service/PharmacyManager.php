@@ -69,7 +69,7 @@ class PharmacyManager
 
         try {
             foreach ($this->csvToArray($file) as $pharmacy) {
-                $this->createPharmacy(
+                $pharmacy = $this->createPharmacy(
                     $pharmacy['name'],
                     $pharmacy['address'],
                     $pharmacy['code'],
@@ -78,6 +78,8 @@ class PharmacyManager
                     $pharmacy['lat'],
                     $pharmacy['lng']
                 );
+                $this->save($pharmacy);
+                $this->em->clear();
             }
         } catch (\Exception $e) {
             $this->em->getConnection()->rollback();
@@ -124,7 +126,7 @@ class PharmacyManager
         $pharmacy->setLat($this->validateLatCoordinate(floatval($lat)));
         $pharmacy->setLng($this->validateLngCoordinate(floatval($lng)));
 
-        return $this->save($pharmacy);
+        return $pharmacy;
     }
 
     private function validateLatCoordinate($coordinate)
@@ -145,12 +147,11 @@ class PharmacyManager
         return $coordinate;
     }
 
-    public function save($e)
+    public function validate($e)
     {
         $validator = $this->validator->validate($e);
         if (0 === count($validator)) {
-            $this->em->persist($e);
-            $this->em->flush();
+            $this->save($e);
 
             return $e;
         } else {
@@ -160,5 +161,11 @@ class PharmacyManager
 
             return false;
         }
+    }
+
+    public function save($e)
+    {
+        $this->em->persist($e);
+        $this->em->flush();
     }
 }

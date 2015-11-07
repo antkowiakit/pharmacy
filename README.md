@@ -1,10 +1,10 @@
+![header](https://pharmacy.antkowiak.it/img/git_header.png)
 ## Apteki - Pharmacy
 Strona domowa projektu: https://pharmacy.antkowiak.it/
 
 ## Członkowie zespołu i podział pracy:
 - **Patryk Antkowiak** 113983 patryk.antkowiak@student.put.poznan.pl *Backend*
 - **Norbert Sroczyński** 113982 norbert.sroczynski@student.put.poznan.pl *iOS Developer*
-![header](https://pharmacy.antkowiak.it/img/git_header.png)
 
 ## Opis projektu:
 Projekt Apteki, to wyszukiwarka aptek w pobliżu na urządzenia iOS. Apteki wyświetlane są na mapie. Po kliknięciu ukazuje się odległość do wybranej apteki oraz jest możliwość wyznaczenia trasy do wybranej apteki.

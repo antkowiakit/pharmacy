@@ -1,4 +1,5 @@
 git pull
+composer update
 app/console cache:clear -e=prod
 yes | app/console doctrine:migrations:migrate
 app/console assets:install -e=prod
